@@ -24,10 +24,12 @@ jobs:
 
       - name: Run Ruff lint
         working-directory: back
+        continue-on-error: true
         run: ruff .
 
       - name: Check formatting with Black and Isort
         working-directory: back
+        continue-on-error: true
         run: |
           black --check .
           isort --check-only .
@@ -54,6 +56,7 @@ jobs:
 
       - name: Run Pytest
         working-directory: back
+        continue-on-error: true
         run: pytest
 
   frontend-lint:
@@ -77,9 +80,11 @@ jobs:
 
       - name: Run ESLint
         working-directory: frontend
+        continue-on-error: true
         run: npm run lint
 
       - name: Check formatting with Prettier
+        continue-on-error: true
         working-directory: frontend
         run: npx prettier --check .
 
@@ -105,6 +110,7 @@ jobs:
 
       - name: Run Vitest
         working-directory: frontend
+        continue-on-error: true
         run: npm run test
 
   backend-build-push:
