@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.env # Très important : N'envoyez jamais votre fichier .env sur GitHub !
+.pytest_cache/
+.mypy_cache/
+.venv/
+
+# Database
+*.sqlite3
+*.db
+
+# IDEs
+.idea/ # Pour PyCharm si jamais vous y reveniez
+.vscode/ # Pour VS Code (peut contenir des paramètres personnels)
