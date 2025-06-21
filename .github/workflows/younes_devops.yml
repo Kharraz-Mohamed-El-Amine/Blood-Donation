@@ -19,15 +19,15 @@ jobs:
           python-version: 3.11
 
       - name: Install linting tools
-        working-directory: backend
+        working-directory: back
         run: pip install ruff black isort
 
       - name: Run Ruff lint
-        working-directory: backend
+        working-directory: back
         run: ruff .
 
       - name: Check formatting with Black and Isort
-        working-directory: backend
+        working-directory: back
         run: |
           black --check .
           isort --check-only .
@@ -45,15 +45,15 @@ jobs:
           python-version: 3.11
 
       - name: Install dependencies
-        working-directory: backend
+        working-directory: back
         run: pip install -r requirements.txt
 
       - name: Install pytest
-        working-directory: backend
+        working-directory: back
         run: pip install pytest
 
       - name: Run Pytest
-        working-directory: backend
+        working-directory: back
         run: pytest
 
   frontend-lint:
