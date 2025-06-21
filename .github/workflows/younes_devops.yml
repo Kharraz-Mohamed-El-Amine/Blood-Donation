@@ -130,7 +130,7 @@ jobs:
           password: ${{ secrets.DOCKER_BACK_PASSWORD }}
 
       - name: Build backend Docker image
-        run: docker build -t ${{ secrets.DOCKER_BACK_USER }}/backend:latest backend/
+        run: docker build -t ${{ secrets.DOCKER_BACK_USER }}/backend:latest back/
 
       - name: Push backend image
         run: docker push ${{ secrets.DOCKER_BACK_USER }}/backend:latest
