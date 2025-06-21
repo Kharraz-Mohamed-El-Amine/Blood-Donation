@@ -1,0 +1,152 @@
+name: younes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install linting tools
+        working-directory: backend
+        run: pip install ruff black isort
+
+      - name: Run Ruff lint
+        working-directory: backend
+        run: ruff .
+
+      - name: Check formatting with Black and Isort
+        working-directory: backend
+        run: |
+          black --check .
+          isort --check-only .
+
+  backend-test:
+    runs-on: ubuntu-latest
+    needs: backend-lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Install pytest
+        working-directory: backend
+        run: pip install pytest
+
+      - name: Run Pytest
+        working-directory: backend
+        run: pytest
+
+  frontend-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Install prettier
+        working-directory: frontend
+        run: npm install prettier
+
+      - name: Run ESLint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Check formatting with Prettier
+        working-directory: frontend
+        run: npx prettier --check .
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    needs: frontend-lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Install Vitest
+        working-directory: frontend
+        run: npm install vitest
+
+      - name: Run Vitest
+        working-directory: frontend
+        run: npm run test
+
+  backend-build-push:
+    runs-on: ubuntu-latest
+    needs: backend-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_BACK_USER }}
+          password: ${{ secrets.DOCKER_BACK_PASSWORD }}
+
+      - name: Build backend Docker image
+        run: docker build -t ${{ secrets.DOCKER_BACK_USER }}/backend:latest backend/
+
+      - name: Push backend image
+        run: docker push ${{ secrets.DOCKER_BACK_USER }}/backend:latest
+
+  frontend-build-push:
+    runs-on: ubuntu-latest
+    needs: frontend-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_FRONT_USER }}
+          password: ${{ secrets.DOCKER_FRONT_PASSWORD }}
+
+      - name: Build frontend Docker image
+        run: docker build -t ${{ secrets.DOCKER_FRONT_USER }}/frontend:latest frontend/
+
+      - name: Push frontend image
+        run: docker push ${{ secrets.DOCKER_FRONT_USER }}/frontend:latest
